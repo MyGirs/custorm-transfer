@@ -28,7 +28,7 @@
           {{ rightText }}
         </el-checkbox>
         <el-checkbox-group v-model="selectedValue" @change="handleSelected">
-          <el-checkbox v-for="item in selectedList" :label="item[id]" :key="item[id]">
+          <el-checkbox v-for="(item, index) in selectedList" :label="item[id]" :key="index">
             {{ item[name] }}
           </el-checkbox>
         </el-checkbox-group>
@@ -153,10 +153,19 @@ export default {
         this.checkedValue = []
         this.isIndeterminate = true
         this.checkAll = false
+        let start = (val - 1) * this.pageSize
         if (this.keyWord) {
-          this.currentData = this.filterList.slice((val - 1) * this.pageSize, val * this.pageSize)
+          if (start >= this.filterList.length) {
+            start = 0
+            this.pageCount = 1
+          }
+          this.currentData = this.filterList.slice((this.pageCount - 1) * this.pageSize, this.pageCount * this.pageSize)
         } else {
-          this.currentData = this.checkAllList.slice((val - 1) * this.pageSize, val * this.pageSize)
+          if (start >= this.checkAllList.length) {
+            start = 0
+            this.pageCount = 1
+          }
+          this.currentData = this.checkAllList.slice((this.pageCount - 1) * this.pageSize, this.pageCount * this.pageSize)
         }
       } else {
         this.checkedValue = []
@@ -184,13 +193,19 @@ export default {
           this.selectedList.push(item)
         }
       })
-      this.deleteList(this.checkedValue, this.filterList)
-      this.deleteList(this.checkedValue, this.checkAllList)
+      if (this.filterList.length) {
+        this.deleteList(this.checkedValue, this.filterList)
+      }
+      if (this.checkAllList.length) {
+        this.deleteList(this.checkedValue, this.checkAllList)
+      }
+      this.checkedValue = []
       this.handlerCurrent(this.pageCount)
     },
     deleteSelected() {
       this.mergeToCheckList()
       this.deleteList(this.selectedValue, this.selectedList)
+      this.selectedValue = []
       this.handlerCurrent(this.pageCount)
       this.isIndeterminateSelected = true
     },
@@ -201,12 +216,11 @@ export default {
           i--
         }
       }
-      taget = []
     },
     mergeToCheckList(type) {
       let list = []
       let { parent, id, index } = this.options
-      let parentKey = this.checkAllList[0][parent]
+      let parentKey = this.sourceList[0]?.[parent] || ''
       if (type) {
         this.selectedList.forEach(item => {
           if (item[parent] == parentKey) {

@@ -204,9 +204,14 @@ export default {
       taget = []
     },
     mergeToCheckList(type) {
-      let list = []
+      let list = [], parentKey = ""
       let { parent, id, index } = this.options
-      let parentKey = this.checkAllList[0][parent]
+      if(this.checkAllList && this.checkAllList.length > 0) {
+        parentKey = this.checkAllList[0][parent]
+      }else if(this.selectedList && this.selectedList.length>0) {
+        parentKey = this.selectedList[0][parent]
+      }
+      
       if (type) {
         this.selectedList.forEach(item => {
           if (item[parent] == parentKey) {

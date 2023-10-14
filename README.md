@@ -27,7 +27,7 @@ new Vue({
 
 ## 在线体验
 
-https://mygirs.github.io/transfer-demo/index.html
+https://mygirs.github.io/transfer-demo
 
 ## 源码地址
 
